@@ -1,0 +1,32 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User, UserRole } from './entities/user.entity';
+
+@Injectable()
+export class UsersService {
+    constructor(
+        @InjectRepository(User)
+        private usersRepository: Repository<User>,
+    ) { }
+
+    findOneByPhone(phone: string): Promise<User | null> {
+        return this.usersRepository.findOneBy({ phone });
+    }
+
+    async create(phone: string, role: UserRole = UserRole.CUSTOMER): Promise<User> {
+        const user = this.usersRepository.create({ phone, role });
+        return this.usersRepository.save(user);
+    }
+
+    async updateOtp(userId: string, otp: string | null, expiry: Date | null): Promise<void> {
+        await this.usersRepository.update(userId, {
+            lastOtp: otp as any,
+            otpExpiry: expiry as any,
+        });
+    }
+
+    async findOne(id: string): Promise<User | null> {
+        return this.usersRepository.findOneBy({ id });
+    }
+}
