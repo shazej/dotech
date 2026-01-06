@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/onboarding_bloc.dart';
-import '../../jobs/presentation/pages/dashboard_page.dart';
+import 'package:dotech_provider/features/jobs/presentation/pages/dashboard_page.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});

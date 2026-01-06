@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/auth_bloc.dart';
-import '../../onboarding/presentation/pages/onboarding_page.dart';
+import 'package:dotech_provider/features/onboarding/presentation/pages/onboarding_page.dart';
 
 class OtpPage extends StatefulWidget {
   final String phone;

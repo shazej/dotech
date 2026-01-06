@@ -23,12 +23,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Dotech Services'),
         elevation: 2,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {},
-          ),
-        ],
+        actions: [IconButton(icon: const Icon(Icons.person), onPressed: () {})],
       ),
       body: BlocBuilder<DiscoveryBloc, DiscoveryState>(
         builder: (context, state) {
@@ -66,7 +61,11 @@ class _HomePageState extends State<HomePage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.room_service, size: 48, color: Colors.indigo),
+                        const Icon(
+                          Icons.room_service,
+                          size: 48,
+                          color: Colors.indigo,
+                        ),
                         const SizedBox(height: 12),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -81,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'From $${service.basePrice}',
+                          'From \$${service.basePrice}',
                           style: TextStyle(color: Colors.grey[600]),
                         ),
                       ],
@@ -98,29 +97,18 @@ class _HomePageState extends State<HomePage> {
                   Text('Error: ${state.message}'),
                   ElevatedButton(
                     onPressed: () {
-                      context.read<DiscoveryBloc>().add(const LoadServicesEvent());
+                      context.read<DiscoveryBloc>().add(
+                        const LoadServicesEvent(),
+                      );
                     },
                     child: const Text('Retry'),
-                  )
+                  ),
                 ],
               ),
             );
           }
           return const SizedBox();
         },
-      ),
-    );
-  }
-
-  Widget _buildCategoryCard(IconData icon, String label) {
-    return Card(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 40, color: Colors.indigo),
-          const SizedBox(height: 10),
-          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-        ],
       ),
     );
   }

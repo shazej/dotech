@@ -10,6 +10,13 @@ import 'package:dotech_customer/features/auth/presentation/pages/login_page.dart
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init();
+
+  // Initialize Notifications
+  // In a real app, this would happen after login with the actual user ID
+  // For demo, we might skip or put it in a bloc
+  // final notificationService = NotificationService();
+  // notificationService.init('123'); // Mock User ID
+
   runApp(const MyApp());
 }
 

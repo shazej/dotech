@@ -1,0 +1,65 @@
+name: Dotech CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+    - run: npm ci
+    - run: npm run build
+    - run: npm run test
+
+  customer-app-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./dotech_customer
+    steps:
+    - uses: actions/checkout@v3
+    - uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+    - run: flutter pub get
+    - run: flutter analyze
+    - run: flutter test
+
+  provider-app-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./dotech_provider
+    steps:
+    - uses: actions/checkout@v3
+    - uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+    - run: flutter pub get
+    - run: flutter analyze
+    - run: flutter test
+
+  admin-dashboard-build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./dotech_admin
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+    - run: npm ci
+    - run: npm run build

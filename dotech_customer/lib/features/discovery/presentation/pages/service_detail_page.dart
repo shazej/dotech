@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dotech_customer/features/discovery/domain/entities/service.dart';
 import 'package:dotech_customer/features/booking/presentation/bloc/booking_bloc.dart';
+import 'package:dotech_customer/features/booking/presentation/pages/payment_page.dart';
 
 class ServiceDetailPage extends StatelessWidget {
   final Service service;
@@ -31,10 +32,13 @@ class ServiceDetailPage extends StatelessWidget {
               children: [
                 Text(
                   service.name,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 Text(
-                  '$${service.basePrice}',
+                  '\$${service.basePrice}',
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -55,9 +59,9 @@ class ServiceDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              service.description.isNotEmpty 
-                ? service.description 
-                : 'No description provided for this service.',
+              service.description.isNotEmpty
+                  ? service.description
+                  : 'No description provided for this service.',
               style: const TextStyle(fontSize: 16, height: 1.5),
             ),
             const SizedBox(height: 40),
@@ -69,25 +73,15 @@ class ServiceDetailPage extends StatelessWidget {
                   );
                   Navigator.pop(context);
                 } else if (state is BookingError) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(state.message)),
-                  );
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(state.message)));
                 }
               },
               builder: (context, state) {
                 return ElevatedButton(
-                  onPressed: state is BookingLoading
-                      ? null
-                      : () {
-                          context.read<BookingBloc>().add(
-                                PlaceBookingEvent(
-                                  serviceId: service.id,
-                                  scheduledAt: DateTime.now().add(const Duration(days: 1)),
-                                  addressId: 'temp-address-id',
-                                ),
-                              );
-                        },
                   style: ElevatedButton.styleFrom(
+                    // Retained original style
                     minimumSize: const Size(double.infinity, 55),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -96,6 +90,28 @@ class ServiceDetailPage extends StatelessWidget {
                   child: state is BookingLoading
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text('Book Now', style: TextStyle(fontSize: 18)),
+                  onPressed: () async {
+                    final success = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => PaymentPage(amount: service.basePrice),
+                      ),
+                    );
+
+                    if (success == true) {
+                      if (context.mounted) {
+                        context.read<BookingBloc>().add(
+                          PlaceBookingEvent(
+                            serviceId: service.id,
+                            scheduledAt: DateTime.now().add(
+                              const Duration(days: 1),
+                            ),
+                            addressId: 'temp-address-id',
+                          ),
+                        );
+                      }
+                    }
+                  },
                 );
               },
             ),
