@@ -46,4 +46,13 @@ export class AuthService {
             accessToken: this.jwtService.sign(payload),
         };
     }
+
+    async loginAdmin(email: string) {
+        // Mock Admin Payload
+        const payload = { sub: 'admin-uuid', email, role: 'admin' };
+        return {
+            accessToken: this.jwtService.sign(payload),
+            user: { id: 'admin-uuid', email, role: 'admin' },
+        };
+    }
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-// import api from '../services/api';
+import api from '../services/api';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -14,22 +14,21 @@ const Login = () => {
         e.preventDefault();
         setError('');
 
-        // Mock Login for now (Since backend admin auth might not be fully ready/seeded)
-        if (email === 'admin@dotech.com' && password === 'admin123') {
-            login('mock-admin-token');
-            navigate('/');
-        } else {
-            setError('Invalid credentials');
-        }
+        try {
+            // Real Login Implementation
+            const { data } = await api.post('/auth/login', { email, password });
 
-        // Real implementation:
-        // try {
-        //   const { data } = await api.post('/auth/login', { email, password });
-        //   login(data.accessToken);
-        //   navigate('/');
-        // } catch (err) {
-        //   setError('Login failed');
-        // }
+            if (data && data.accessToken) {
+                login(data.accessToken);
+                navigate('/');
+            } else {
+                setError('Login failed: Invalid response');
+            }
+
+        } catch (err: any) {
+            console.error(err);
+            setError(err.response?.data?.message || 'Login failed');
+        }
     };
 
     return (

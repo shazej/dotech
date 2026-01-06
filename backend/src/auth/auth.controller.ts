@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -14,5 +14,14 @@ export class AuthController {
     @Post('otp/verify')
     async verifyOtp(@Body('phone') phone: string, @Body('otp') otp: string) {
         return this.authService.verifyOtp(phone, otp);
+    }
+
+    @Post('login')
+    async login(@Body() body: any) {
+        // Simple Admin Mock Auth check in controller, then generic sign in service
+        if (body.email === 'admin@dotech.com' && body.password === 'admin123') {
+            return this.authService.loginAdmin(body.email);
+        }
+        throw new UnauthorizedException('Invalid credentials');
     }
 }

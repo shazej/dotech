@@ -18,7 +18,7 @@ export class User {
     email?: string;
 
     @Column({
-        type: 'enum',
+        type: 'simple-enum',
         enum: UserRole,
         default: UserRole.CUSTOMER,
     })
@@ -30,7 +30,7 @@ export class User {
     @Column({ nullable: true })
     lastOtp?: string;
 
-    @Column({ type: 'timestamp', nullable: true })
+    @Column({ type: 'datetime', nullable: true })
     otpExpiry?: Date;
 
     @CreateDateColumn()
