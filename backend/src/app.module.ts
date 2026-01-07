@@ -20,12 +20,10 @@ import { BookingsModule } from './bookings/bookings.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const isProduction = configService.get<string>('NODE_ENV') === 'production';
-        // FORCE LOCAL DEV: Docker is down, so we must use SQLite.
-        const useSqlite = true;
+        const useSqlite = true; // Switched to SQLite as per user confirmation due to missing Docker
 
         if (useSqlite) {
-          console.log('Using SQLite Database (Mode: Forced Local)');
+          console.log('Using SQLite Database (Mode: Fallback/Local)');
           return {
             type: 'sqlite',
             database: 'dotech.sqlite',
@@ -36,11 +34,11 @@ import { BookingsModule } from './bookings/bookings.module';
 
         return {
           type: 'postgres',
-          host: configService.get<string>('DB_HOST'),
-          port: configService.get<number>('DB_PORT'),
-          username: configService.get<string>('DB_USER'),
-          password: configService.get<string>('DB_PASSWORD'),
-          database: configService.get<string>('DB_NAME'),
+          host: configService.get<string>('DB_HOST') || 'localhost',
+          port: parseInt(configService.get<string>('DB_PORT') || '5432'),
+          username: configService.get<string>('DB_USER') || 'postgres',
+          password: configService.get<string>('DB_PASSWORD') || 'postgres',
+          database: configService.get<string>('DB_NAME') || 'dotech',
           autoLoadEntities: true,
           synchronize: true, // Only for development!
         };

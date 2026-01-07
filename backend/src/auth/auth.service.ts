@@ -34,7 +34,8 @@ export class AuthService {
             throw new UnauthorizedException('Invalid or expired OTP');
         }
 
-        // Clear OTP after successful verification
+        // Clear OTP and mark verified after successful verification
+        await this.usersService.markVerified(user.id);
         await this.usersService.updateOtp(user.id, null, null);
 
         return this.login(user);

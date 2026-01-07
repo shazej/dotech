@@ -1,6 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Provider } from '../../providers/entities/provider.entity';
+import { BookingAttachment } from './booking-attachment.entity';
+import { BookingExtraCharge } from './booking-extra-charge.entity';
 
 export enum BookingStatus {
     PENDING = 'pending',
@@ -53,6 +55,12 @@ export class Booking {
 
     @Column({ type: 'datetime', nullable: true })
     completedAt: Date;
+
+    @OneToMany(() => BookingAttachment, (attachment) => attachment.booking, { cascade: true })
+    attachments: BookingAttachment[];
+
+    @OneToMany(() => BookingExtraCharge, (charge) => charge.booking, { cascade: true })
+    extraCharges: BookingExtraCharge[];
 
     @CreateDateColumn()
     createdAt: Date;

@@ -1,4 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, OneToMany } from 'typeorm';
+import { CustomerProfile } from './customer-profile.entity';
+import { ProviderProfile } from './provider-profile.entity';
+import { CustomerAddress } from './customer-address.entity';
 
 export enum UserRole {
     CUSTOMER = 'customer',
@@ -32,6 +35,15 @@ export class User {
 
     @Column({ type: 'datetime', nullable: true })
     otpExpiry?: Date;
+
+    @OneToOne(() => CustomerProfile, (profile) => profile.user, { cascade: true })
+    customerProfile!: CustomerProfile;
+
+    @OneToOne(() => ProviderProfile, (profile) => profile.user, { cascade: true })
+    providerProfile!: ProviderProfile;
+
+    @OneToMany(() => CustomerAddress, (address) => address.user, { cascade: true })
+    addresses!: CustomerAddress[];
 
     @CreateDateColumn()
     createdAt: Date;

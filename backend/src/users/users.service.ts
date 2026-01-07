@@ -26,6 +26,10 @@ export class UsersService {
         });
     }
 
+    async markVerified(userId: string): Promise<void> {
+        await this.usersRepository.update(userId, { isVerified: true });
+    }
+
     async findOne(id: string): Promise<User | null> {
         return this.usersRepository.findOneBy({ id });
     }

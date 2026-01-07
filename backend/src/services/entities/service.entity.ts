@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
-import { Provider } from '../../providers/entities/provider.entity';
+import { ProviderProfile } from '../../users/entities/provider-profile.entity';
+import { Category } from './category.entity';
 
 @Entity('services')
 export class Service {
@@ -9,9 +10,16 @@ export class Service {
     @Column()
     providerId: string;
 
-    @ManyToOne(() => Provider)
+    @ManyToOne(() => ProviderProfile)
     @JoinColumn({ name: 'providerId' })
-    provider: Provider;
+    provider: ProviderProfile;
+
+    @Column()
+    categoryId: string;
+
+    @ManyToOne(() => Category, (category) => category.services)
+    @JoinColumn({ name: 'categoryId' })
+    category: Category;
 
     @Column()
     name: string;
