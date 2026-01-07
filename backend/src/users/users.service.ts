@@ -8,6 +8,8 @@ export class UsersService {
     constructor(
         @InjectRepository(User)
         private usersRepository: Repository<User>,
+        @InjectRepository(ProviderProfile)
+        private providerProfilesRepository: Repository<ProviderProfile>,
     ) { }
 
     findOneByPhone(phone: string): Promise<User | null> {
@@ -24,6 +26,16 @@ export class UsersService {
             lastOtp: otp as any,
             otpExpiry: expiry as any,
         });
+    }
+
+    async createProviderProfile(userId: string, businessName: string): Promise<ProviderProfile> {
+        const profile = this.providerProfilesRepository.create({
+            userId,
+            businessName,
+            isVerified: true, // Auto verify for dev
+            rating: 5.0,
+        });
+        return this.providerProfilesRepository.save(profile);
     }
 
     async markVerified(userId: string): Promise<void> {
