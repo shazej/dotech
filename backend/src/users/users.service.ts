@@ -46,4 +46,8 @@ export class UsersService {
     async findOne(id: string): Promise<User | null> {
         return this.usersRepository.findOneBy({ id });
     }
+
+    async findProviderProfile(userId: string): Promise<ProviderProfile | null> {
+        return this.providerProfilesRepository.findOneBy({ userId });
+    }
 }

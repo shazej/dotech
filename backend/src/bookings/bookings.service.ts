@@ -108,4 +108,11 @@ export class BookingsService {
             return manager.save(booking);
         });
     }
+
+    async findOne(id: string) {
+        return this.bookingsRepository.findOne({
+            where: { id },
+            relations: ['provider', 'customer', 'attachments', 'extraCharges'],
+        });
+    }
 }

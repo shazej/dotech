@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Param, Patch, Request, UseGuards, ParseEnumPipe } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Patch, Request, UseGuards, ParseEnumPipe } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { BookingStatus } from './entities/booking.entity';
 
@@ -43,5 +43,9 @@ export class BookingsController {
     ) {
         const userId = req.headers['x-user-id'] || 'test-user-id';
         return this.bookingsService.updateStatus(id, userId, status);
+    }
+    @Get(':id')
+    async findOne(@Param('id') id: string) {
+        return this.bookingsService.findOne(id);
     }
 }
