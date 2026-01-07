@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { Booking, BookingStatus } from './entities/booking.entity';
 import { Service } from '../services/entities/service.entity';
-import { Provider, ProviderStatus } from '../providers/entities/provider.entity';
+import { ProviderProfile } from '../users/entities/provider-profile.entity';
 import { User } from '../users/entities/user.entity';
 
 @Injectable()
