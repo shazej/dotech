@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Provider } from '../../providers/entities/provider.entity';
+import { ProviderProfile } from '../../users/entities/provider-profile.entity';
 import { BookingAttachment } from './booking-attachment.entity';
 import { BookingExtraCharge } from './booking-extra-charge.entity';
 
@@ -31,9 +31,9 @@ export class Booking {
     @Column()
     providerId: string;
 
-    @ManyToOne(() => Provider)
+    @ManyToOne(() => ProviderProfile)
     @JoinColumn({ name: 'providerId' })
-    provider: Provider;
+    provider: ProviderProfile;
 
     @Column({ type: 'simple-json' })
     serviceSnapshot: {

@@ -17,11 +17,12 @@ export class BookingsService {
     async create(customerId: string, createBookingDto: { providerId: string; serviceId: string; scheduledAt: string }) {
         return this.dataSource.transaction(async (manager) => {
             // 1. Validate Provider
-            const provider = await manager.findOne(Provider, {
-                where: { userId: createBookingDto.providerId },
+            const provider = await manager.findOne(ProviderProfile, {
+                where: { id: createBookingDto.providerId },
                 relations: ['user']
             });
-            if (!provider || provider.verifiedStatus !== ProviderStatus.VERIFIED) {
+            if (!provider || !provider.isVerified) {
+                // In a real app we would check verifiedStatus, but assuming isVerified bool for now logic from User module
                 throw new BadRequestException('Provider not available or verified');
             }
 
@@ -49,12 +50,15 @@ export class BookingsService {
         });
     }
 
-    async accept(bookingId: string, providerId: string) {
+    async accept(bookingId: string, userId: string) {
         return this.dataSource.transaction(async (manager) => {
-            const booking = await manager.findOne(Booking, { where: { id: bookingId } });
+            const booking = await manager.findOne(Booking, {
+                where: { id: bookingId },
+                relations: ['provider']
+            });
             if (!booking) throw new NotFoundException('Booking not found');
 
-            if (booking.providerId !== providerId) {
+            if (booking.provider.userId !== userId) {
                 throw new BadRequestException('You are not the provider for this booking');
             }
 
