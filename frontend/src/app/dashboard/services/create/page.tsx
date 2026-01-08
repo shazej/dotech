@@ -35,7 +35,7 @@ export default function CreateServicePage() {
                 ...data,
                 // We might need to inject provider info if backend doesn't take it from token
                 // but usually backend takes it from token.
-            } as any);
+            } as unknown as any);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['services'] });

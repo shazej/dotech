@@ -1,7 +1,5 @@
-```typescript
 import { api } from '@/lib/axios';
 import { AuthResponse, User } from '@/types/auth';
-
 import { LoginFormData, RegisterFormData } from '@/lib/schemas';
 
 export const authService = {
