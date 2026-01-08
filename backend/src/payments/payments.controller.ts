@@ -1,19 +1,17 @@
-import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, Param } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('payments')
 export class PaymentsController {
     constructor(private readonly paymentsService: PaymentsService) { }
 
-    @Post('create-intent')
-    @UseGuards(JwtAuthGuard)
-    createPaymentIntent(@Body() body: { amount: number; currency: string }) {
-        return this.paymentsService.createPaymentIntent(body.amount, body.currency);
+    @Post('intent')
+    async createPaymentIntent(@Body('bookingId') bookingId: string) {
+        return this.paymentsService.createPaymentIntent(bookingId);
     }
 
-    @Post('webhook')
-    handleWebhook(@Body() body: any) {
-        return this.paymentsService.handleWebhook(body);
+    @Post(':id/confirm')
+    async confirmPayment(@Param('id') id: string) {
+        return this.paymentsService.confirmPayment(id);
     }
 }
