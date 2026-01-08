@@ -1,13 +1,16 @@
+```typescript
 import { api } from '@/lib/axios';
 import { AuthResponse, User } from '@/types/auth';
 
+import { LoginFormData, RegisterFormData } from '@/lib/schemas';
+
 export const authService = {
-    login: async (credentials: any): Promise<AuthResponse> => {
+    login: async (credentials: LoginFormData): Promise<AuthResponse> => {
         const { data } = await api.post<AuthResponse>('/auth/login', credentials);
         return data;
     },
 
-    register: async (details: any): Promise<AuthResponse> => {
+    register: async (details: RegisterFormData): Promise<AuthResponse> => {
         const { data } = await api.post<AuthResponse>('/auth/register', details);
         return data;
     },

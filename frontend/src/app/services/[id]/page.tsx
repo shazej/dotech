@@ -105,7 +105,7 @@ export default function ServiceDetailsPage() {
                             </Button>
 
                             <p className="text-xs text-center text-slate-400 mt-4">
-                                You won't be charged yet
+                                You won&apos;t be charged yet
                             </p>
                         </div>
                     </div>

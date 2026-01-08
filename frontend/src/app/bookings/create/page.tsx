@@ -13,7 +13,9 @@ import { format } from 'date-fns';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function CreateBookingPage() {
+import { Suspense } from 'react';
+
+function CreateBookingContent() {
     const searchParams = useSearchParams();
     const serviceId = searchParams.get('serviceId');
 
@@ -124,5 +126,13 @@ export default function CreateBookingPage() {
 
             <Footer />
         </div>
+    );
+}
+
+export default function CreateBookingPage() {
+    return (
+        <Suspense fallback={<div className="flex justify-center p-8"><Loader2 className="h-8 w-8 animate-spin" /></div>}>
+            <CreateBookingContent />
+        </Suspense>
     );
 }
