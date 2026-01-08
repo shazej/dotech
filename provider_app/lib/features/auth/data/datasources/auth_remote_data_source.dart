@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:dotech_provider/core/error/failures.dart';
 import '../models/user_model.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 abstract class AuthRemoteDataSource {
   Future<String> sendOtp(String phone);
@@ -9,8 +10,9 @@ abstract class AuthRemoteDataSource {
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   final Dio dio;
+  final FlutterSecureStorage storage;
 
-  AuthRemoteDataSourceImpl({required this.dio});
+  AuthRemoteDataSourceImpl({required this.dio, required this.storage});
 
   @override
   Future<String> sendOtp(String phone) async {
@@ -30,13 +32,12 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         data: {'phone': phone, 'otp': otp},
       );
       if (response.statusCode == 201 || response.statusCode == 200) {
+        final accessToken = response.data['accessToken'] ?? response.data['access_token'];
+        if (accessToken != null) {
+          await storage.write(key: 'accessToken', value: accessToken);
+        }
         // Mocking for now as verification returns accessToken.
         // In real app, we extract user or fetch profile.
-        return UserModel(
-          id: 'provider-temp-id',
-          phone: phone,
-          role: 'provider',
-          isVerified: true,
         );
       }
       throw const ServerFailure(message: 'Verification failed');

@@ -1,5 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../core/network/auth_interceptor.dart';
 
 // Auth
 import '../features/auth/data/datasources/auth_remote_data_source.dart';
@@ -36,7 +38,7 @@ Future<void> init() async {
     () => AuthRepositoryImpl(remoteDataSource: sl()),
   );
   sl.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(dio: sl()),
+    () => AuthRemoteDataSourceImpl(dio: sl(), storage: sl()),
   );
 
   // Features - Discovery
@@ -63,12 +65,17 @@ Future<void> init() async {
   sl.registerLazySingleton(() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'http://localhost:3000',
+        baseUrl: 'http://192.168.8.16:3000',
         connectTimeout: const Duration(seconds: 5),
         receiveTimeout: const Duration(seconds: 3),
       ),
     );
-    // TODO: Add AuthInterceptor for JWT
+    // Auth Interceptor
+    dio.interceptors.add(sl<AuthInterceptor>());
     return dio;
   });
+
+  // Storage
+  sl.registerLazySingleton(() => const FlutterSecureStorage());
+  sl.registerLazySingleton(() => AuthInterceptor(sl()));
 }
