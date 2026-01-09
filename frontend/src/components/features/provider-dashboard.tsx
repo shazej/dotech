@@ -3,9 +3,21 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Plus } from 'lucide-react';
+import { Plus, DollarSign, CalendarCheck, CheckCircle, Star } from 'lucide-react';
+import { useProviderStats } from '@/hooks/use-provider';
 
 export default function ProviderDashboard() {
+    const { data: stats, isLoading, isError } = useProviderStats();
+
+    // Default values if loading or error (could improve with skeleton loaders)
+    const displayStats = stats || {
+        totalRevenue: 0,
+        activeBookings: 0,
+        completedJobs: 0,
+        rating: 0,
+        totalReviews: 0
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -22,35 +34,47 @@ export default function ProviderDashboard() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+                        <DollarSign className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">$1,230.00</div>
-                        <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+                        <div className="text-2xl font-bold">
+                            {isLoading ? '...' : `$${displayStats.totalRevenue.toFixed(2)}`}
+                        </div>
+                        <p className="text-xs text-muted-foreground">Lifetime earnings</p>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Active Bookings</CardTitle>
+                        <CalendarCheck className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">12</div>
+                        <div className="text-2xl font-bold">
+                            {isLoading ? '...' : displayStats.activeBookings}
+                        </div>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Completed Jobs</CardTitle>
+                        <CheckCircle className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">45</div>
+                        <div className="text-2xl font-bold">
+                            {isLoading ? '...' : displayStats.completedJobs}
+                        </div>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">Rating</CardTitle>
+                        <Star className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">4.8</div>
-                        <p className="text-xs text-muted-foreground">Based on 32 reviews</p>
+                        <div className="text-2xl font-bold">
+                            {isLoading ? '...' : displayStats.rating.toFixed(1)}
+                        </div>
+                        <p className="text-xs text-muted-foreground">Based on {displayStats.totalReviews} reviews</p>
                     </CardContent>
                 </Card>
             </div>

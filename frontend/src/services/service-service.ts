@@ -11,6 +11,11 @@ export const serviceService = {
         return data;
     },
 
+    getMyServices: async (): Promise<Service[]> => {
+        const { data } = await api.get<Service[]>('/providers/me/services');
+        return data;
+    },
+
     getById: async (id: string): Promise<Service> => {
         const { data } = await api.get<Service>(`/services/${id}`);
         return data;
@@ -23,5 +28,10 @@ export const serviceService = {
 
     delete: async (id: string): Promise<void> => {
         await api.delete(`/services/${id}`);
+    },
+
+    getCategories: async (): Promise<import('@/types/service').Category[]> => {
+        const { data } = await api.get('/categories');
+        return data;
     }
 };

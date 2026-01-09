@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { serviceService } from '@/services/service-service';
+import { useCategories } from '@/hooks/use-service';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import Link from 'next/link';
@@ -23,6 +24,7 @@ export default function CreateServicePage() {
     const router = useRouter();
     const queryClient = useQueryClient();
     const { user } = useAuthStore();
+    const { data: categories, isLoading: isLoadingCategories } = useCategories();
 
     const { register, handleSubmit, formState: { errors } } = useForm<CreateServiceForm>();
 
@@ -77,10 +79,11 @@ export default function CreateServicePage() {
                             {...register('categoryId', { required: 'Category is required' })}
                         >
                             <option value="">Select a category</option>
-                            <option value="cat_cleaning">Home Cleaning</option>
-                            <option value="cat_plumbing">Plumbing</option>
-                            <option value="cat_electrical">Electrical</option>
-                            <option value="cat_beauty">Beauty</option>
+                            {categories?.map((cat) => (
+                                <option key={cat.id} value={cat.id}>
+                                    {cat.name}
+                                </option>
+                            ))}
                         </select>
                         {errors.categoryId && <p className="text-sm text-red-500">{errors.categoryId.message}</p>}
                     </div>

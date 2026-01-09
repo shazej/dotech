@@ -20,7 +20,8 @@ import { BookingsModule } from './bookings/bookings.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const useSqlite = true; // Switched to SQLite as per user confirmation due to missing Docker
+        const dbType = configService.get<string>('DB_TYPE') || 'postgres';
+        const useSqlite = dbType === 'sqlite';
 
         if (useSqlite) {
           console.log('Using SQLite Database (Mode: Fallback/Local)');

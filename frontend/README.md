@@ -1,4 +1,41 @@
-# Dotech Frontend
+## Dotech Frontend
+
+## Features
+- **Provider Scheduling**: Business hours, date exceptions.
+- **Appointments**: Calendar view, Full booking lifecycle (Accept/Reject/Reschedule).
+- **Discovery**: Advanced Search, Filtering, Google Maps integration.
+- **Growth**: Referrals, Rate App, SEO basics.
+- **Tech**: Next.js 14, Tailwind, TanStack Query, Firebase Analytics, i18n.
+
+## Setup
+
+1. **Environment Variables**:
+   Copy `.env.local.example` (or use the one created) and fill in:
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:3000
+   NEXT_PUBLIC_USE_MOCKS=true  # Set to false to use real backend
+   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=...
+   NEXT_PUBLIC_FIREBASE_API_KEY=...
+   ```
+
+2. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Run Development Server**:
+   ```bash
+   npm run dev
+   ```
+
+## Documentation
+See `/docs` folder for detailed guides:
+- [Backend Requirements](/docs/backend-requirements.md)
+- [Appointment Lifecycle](/docs/appointment-lifecycle.md)
+- [Analytics Events](/docs/analytics-events.md)
+
+## Mocks
+To test without a backend, ensure `NEXT_PUBLIC_USE_MOCKS=true`. This will intercept API calls and return mock data for Providers, Appointments, and Schedule.
 
 ## Project Overview
 Dotech is a professional service marketplace application connecting customers with service providers. 

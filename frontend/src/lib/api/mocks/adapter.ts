@@ -46,6 +46,48 @@ export const setupMocks = (axiosInstance: AxiosInstance) => {
     mock.onGet(/\/appointments\/provider/).reply(200, mockAppointments);
     mock.onGet(/\/appointments/).reply(200, mockAppointments); // Customer
 
+    // --- Providers Mocks ---
+    const mockProviders = [
+        {
+            id: 'p-1',
+            name: 'John Doe',
+            category: 'Plumber',
+            rating: 4.8,
+            reviewCount: 120,
+            hourlyRate: 50,
+            location: { lat: 40.7128, lng: -74.0060, address: 'New York, NY', city: 'New York' },
+            tags: ['Emergency', 'Residential'],
+            isVerified: true,
+            bio: 'Expert plumber with 10 years experience.',
+            distance: 2.5,
+        },
+        {
+            id: 'p-2',
+            name: 'Jane Smith',
+            category: 'Electrician',
+            rating: 4.9,
+            reviewCount: 85,
+            hourlyRate: 75,
+            location: { lat: 40.7282, lng: -73.7949, address: 'Queens, NY', city: 'Queens' },
+            tags: ['Commercial', 'Certified'],
+            isVerified: true,
+            bio: 'Reliable electrician for all your needs.',
+            distance: 5.1,
+        }
+    ];
+
+    mock.onGet(/\/providers\/featured/).reply(200, mockProviders);
+    mock.onGet(/\/providers\/.+/).reply(200, mockProviders[0]);
+    mock.onGet(/\/providers/).reply((config) => {
+        // Basic filtering mock
+        const params = config.params;
+        let filtered = mockProviders;
+        if (params?.query) {
+            filtered = filtered.filter(p => p.name.toLowerCase().includes(params.query.toLowerCase()));
+        }
+        return [200, { data: filtered, total: filtered.length }];
+    });
+
     // Pass through for un-mocked endpoints (optional, but good for hybrid)
     mock.onAny().passThrough();
 };

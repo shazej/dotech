@@ -1,18 +1,13 @@
 'use client';
 
-import { useServices } from '@/hooks/use-service';
+import { useMyServices, useDeleteService } from '@/hooks/use-service';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Plus, Edit, Trash2 } from 'lucide-react';
-import { useAuthStore } from '@/store/auth-store';
 
 export default function MyServicesPage() {
-    const { user } = useAuthStore();
-    // In a real app, I'd filter by providerId on the backend. 
-    // For now assuming getAll returns everything and I filter client side or API handles 'my-services' endpoint
-    const { data: services, isLoading } = useServices();
-
-    const myServices = services?.filter(s => s.provider.id === user?.id) || [];
+    const { data: myServices = [], isLoading } = useMyServices();
+    const { mutate: deleteService } = useDeleteService();
 
     return (
         <div className="space-y-6">
@@ -71,7 +66,16 @@ export default function MyServicesPage() {
                                             <Button variant="ghost" size="sm">
                                                 <Edit className="h-4 w-4 text-slate-500" />
                                             </Button>
-                                            <Button variant="ghost" size="sm" className="text-red-500 hover:text-red-600 hover:bg-red-50">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                                onClick={() => {
+                                                    if (confirm('Are you sure you want to delete this service?')) {
+                                                        deleteService(service.id);
+                                                    }
+                                                }}
+                                            >
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </td>
