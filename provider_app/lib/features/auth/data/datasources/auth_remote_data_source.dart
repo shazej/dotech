@@ -36,8 +36,17 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         if (accessToken != null) {
           await storage.write(key: 'accessToken', value: accessToken);
         }
-        // Mocking for now as verification returns accessToken.
-        // In real app, we extract user or fetch profile.
+        // Parse user from response
+        final userData = response.data['user'];
+        if (userData != null) {
+          return UserModel.fromJson(userData);
+        }
+
+        return UserModel(
+          id: 'extracted-from-token',
+          phone: phone,
+          role: 'provider',
+          isVerified: true,
         );
       }
       throw const ServerFailure(message: 'Verification failed');

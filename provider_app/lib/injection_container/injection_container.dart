@@ -1,4 +1,27 @@
-import 'package:get_it/get_it.dart';
+import 'dart:io';
+
+// ... imports ...
+
+  sl.registerLazySingleton(() {
+    
+    String resolveBaseUrl() {
+       const port = '3000';
+       if (Platform.isAndroid) {
+           return 'http://10.0.2.2:$port';
+       }
+       return 'http://localhost:$port';
+    }
+
+    final dio = Dio(
+      BaseOptions(
+        baseUrl: resolveBaseUrl(),
+        connectTimeout: const Duration(seconds: 5),
+        receiveTimeout: const Duration(seconds: 3),
+      ),
+    );
+    dio.interceptors.add(sl<AuthInterceptor>());
+    return dio;
+  });
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../core/network/auth_interceptor.dart';
@@ -69,7 +92,10 @@ Future<void> init() async {
   sl.registerLazySingleton(() {
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'http://192.168.8.16:3000',
+        // INSTRUCTION:
+        // Android Emulator: http://10.0.2.2:3000
+        // iOS Simulator: http://localhost:3000
+        baseUrl: 'http://localhost:3000',
         connectTimeout: const Duration(seconds: 5),
         receiveTimeout: const Duration(seconds: 3),
       ),

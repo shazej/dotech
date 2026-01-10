@@ -1,0 +1,61 @@
+[36m--- Dotech Environment Doctor ---
+[0m
+Checking Port 6379... [32m✅ Active[0m
+Checking Port 5432... [32m✅ Active[0m
+Checking Backend Health Details... [32m✅ ALL SYSTEMS GO[0m
+{
+  "api": "ok",
+  "db": {
+    "ok": true,
+    "latencyMs": 1
+  },
+  "redis": {
+    "ok": true,
+    "message": "Redis check skipped (not fully integrated in module yet)"
+  },
+  "timestamp": "2026-01-10T00:19:30.741Z"
+}
+
+--- Mobile Platform URLs ---
+
+| Platform          | Base URL                  |
+|:----------------- |:------------------------- |
+| iOS Simulator     | http://localhost:3000     |
+| Android Emulator  | http://10.0.2.2:3000      |
+| Physical Device   | http://<LAN_IP>:3000      |
+    
+[36m
+--- Summary ---[0m
+[32m🎉 System appears healthy![0m
+Seeding database...
+Ensure backend is running on port 3000!
+cd backend && node seed.js
+🌱 Starting Idempotent Seed...
+
+👤 Processing User: admin@dotech.com...
+   ✅ Logged in as admin
+
+📂 Processing Categories...
+   ✅ Created: Cleaning
+   ✅ Created: Plumbing
+   ✅ Created: Electrical
+   ✅ Created: Painting
+   ✅ Created: Moving
+   ✅ Created: Gardening
+
+👤 Processing User: provider1@dotech.com...
+   ✅ Logged in as provider
+   ➕ Service created: Standard Cleaning
+
+👤 Processing User: provider2@dotech.com...
+   ✅ Logged in as provider
+   ➕ Service created: Standard Plumbing
+
+👤 Processing User: customer1@dotech.com...
+   ✅ Logged in as customer
+
+📅 Creating Booking for Standard Cleaning...
+   ⚠️ Booking creation skipped or failed (500)
+
+🎉 Idempotent Seed Complete!
+Creds: admin@dotech.com, customer1@dotech.com, provider1@dotech.com (All: password123)

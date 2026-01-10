@@ -1,14 +1,15 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { ServicesService } from './services.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('services')
 export class ServicesController {
     constructor(private readonly servicesService: ServicesService) { }
 
     @Post()
-    create(@Body() createServiceDto: any) {
-        // In real app, providerId comes from Auth User
-        return this.servicesService.create(createServiceDto);
+    @UseGuards(AuthGuard('jwt'))
+    create(@Request() req: any, @Body() createServiceDto: any) {
+        return this.servicesService.create(req.user.id, createServiceDto);
     }
 
     @Get()

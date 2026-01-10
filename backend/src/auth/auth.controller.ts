@@ -1,5 +1,7 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Get, Body, UnauthorizedException, UseGuards, Request } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
+import { UserRole } from '../users/entities/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -16,12 +18,27 @@ export class AuthController {
         return this.authService.verifyOtp(phone, otp);
     }
 
+    @Post('register')
+    async register(@Body() body: any) {
+        return this.authService.register(body.email, body.password, body.phone, body.role || UserRole.CUSTOMER);
+    }
+
     @Post('login')
     async login(@Body() body: any) {
-        // Simple Admin Mock Auth check in controller, then generic sign in service
-        if (body.email === 'admin@dotech.com' && body.password === 'admin123') {
-            return this.authService.loginAdmin(body.email);
-        }
-        throw new UnauthorizedException('Invalid credentials');
+        return this.authService.loginWithPassword(body.email, body.password);
+    }
+
+    @Get('me')
+    @UseGuards(AuthGuard('jwt'))
+    getMe(@Request() req: any) {
+        // Map to frontend expected format if needed, or just return what we have
+        // Frontend expects id, email, role. JwtStrategy returns userId, phone, role.
+        // We might need to fetch the full user if we want email/profile.
+        // For now, let's return the basic info and handle frontend mapping.
+        return {
+            id: req.user.userId,
+            phone: req.user.phone,
+            role: req.user.role,
+        };
     }
 }

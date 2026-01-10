@@ -22,6 +22,18 @@ export class UsersService {
         return this.usersRepository.save(user);
     }
 
+    findOneByEmail(email: string): Promise<User | null> {
+        return this.usersRepository.findOne({
+            where: { email },
+            select: ['id', 'email', 'password', 'role', 'phone', 'isVerified']
+        });
+    }
+
+    async createWithPassword(email: string, password: string, phone: string, role: UserRole): Promise<User> {
+        const user = this.usersRepository.create({ email, password, phone, role, isVerified: true });
+        return this.usersRepository.save(user);
+    }
+
     async updateOtp(userId: string, otp: string | null, expiry: Date | null): Promise<void> {
         await this.usersRepository.update(userId, {
             lastOtp: otp as any,

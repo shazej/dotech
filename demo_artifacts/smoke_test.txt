@@ -1,0 +1,5 @@
+💨 Starting Smoke Tests...
+[32m✅ Health Check Passed[0m
+[32m✅ Auth Login Passed[0m
+[32m✅ Protected Route (Bookings) Passed[0m
+✨ All Smoke Tests Passed

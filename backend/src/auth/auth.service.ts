@@ -1,4 +1,5 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, BadRequestException } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
 import { User, UserRole } from '../users/entities/user.entity';
@@ -56,5 +57,34 @@ export class AuthService {
             accessToken: this.jwtService.sign(payload),
             user: { id: 'admin-uuid', email, role: 'admin' },
         };
+    }
+
+    async register(email: string, password: string, phone: string, role: UserRole) {
+        const existingInfo = await this.usersService.findOneByPhone(phone);
+        if (existingInfo) throw new ConflictException('Phone already exists');
+
+        const existingEmail = await this.usersService.findOneByEmail(email);
+        if (existingEmail) throw new ConflictException('Email already exists');
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await this.usersService.createWithPassword(email, hashedPassword, phone, role);
+
+        if (role === UserRole.PROVIDER) {
+            await this.usersService.createProviderProfile(user.id, `Business of ${email.split('@')[0]}`);
+        }
+
+        return this.login(user);
+    }
+
+    async loginWithPassword(email: string, pass: string) {
+        const user = await this.usersService.findOneByEmail(email);
+        if (!user || !user.password) {
+            throw new UnauthorizedException('Invalid credentials');
+        }
+
+        const isMatch = await bcrypt.compare(pass, user.password);
+        if (!isMatch) throw new UnauthorizedException('Invalid credentials');
+
+        return this.login(user);
     }
 }

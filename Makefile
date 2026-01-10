@@ -4,7 +4,7 @@
 .PHONY: setup dev up down db-reset lint test format check-ports help
 
 # Variables
-DC=docker-compose
+DC=docker compose
 BACKEND_DIR=backend
 FRONTEND_DIR=frontend
 
@@ -36,7 +36,13 @@ setup:
 
 # Docker Services
 up:
-	$(DC) up -d
+	@if command -v docker >/dev/null 2>&1; then \
+		$(DC) up -d; \
+	else \
+		echo "Docker not found, starting native services..."; \
+		brew services start postgresql || brew services start postgresql@15 || echo "⚠️  Postgres start failed (check manually)"; \
+		brew services start redis || echo "⚠️  Redis start failed"; \
+	fi
 	@echo "Waiting for services to be ready..."
 	sleep 5
 
@@ -56,17 +62,13 @@ db-migrate:
 	@echo "Schema changes are applied automatically when the backend starts."
 	@echo "To run manual migrations, add typeorm scripts to package.json."
 
-db-seed:
+doctor:
+	@node scripts/doctor.js
+
+db-seed: doctor
 	@echo "Seeding database..."
 	@echo "Ensure backend is running on port 3000!"
 	cd $(BACKEND_DIR) && node seed.js
-
-# Utility
-check-ports:
-	@echo "Checking ports 3000, 5432, 6379..."
-	@lsof -i :3000 || echo "Port 3000 is free"
-	@lsof -i :5432 || echo "Port 5432 is free"
-	@lsof -i :6379 || echo "Port 6379 is free"
 
 mobile-setup:
 	@echo "Installing Provider App Dependencies..."
@@ -75,6 +77,16 @@ mobile-setup:
 	cd customer_app && flutter pub get
 	@echo "Mobile Setup Complete. Note: Update 'baseUrl' in injection_container.dart before running."
 
+doctor:
+	@node scripts/doctor.js
+
 lint:
 	cd $(BACKEND_DIR) && npm run lint
 	cd $(FRONTEND_DIR) && npm run lint
+
+# One-Command Demo
+demo:
+	@./scripts/demo.sh
+
+test-smoke:
+	@node scripts/smoke.test.js

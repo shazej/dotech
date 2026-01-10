@@ -10,7 +10,7 @@ export function useLogin() {
     return useMutation({
         mutationFn: authService.login,
         onSuccess: (data) => {
-            login(data.user, data.token);
+            login(data.user, data.accessToken);
             router.push('/dashboard'); // Default redirect
         },
     });
@@ -23,7 +23,7 @@ export function useRegister() {
     return useMutation({
         mutationFn: authService.register,
         onSuccess: (data) => {
-            login(data.user, data.token);
+            login(data.user, data.accessToken);
             router.push('/dashboard');
         },
     });

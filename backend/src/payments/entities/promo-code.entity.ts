@@ -23,7 +23,7 @@ export class PromoCode {
     @Column({ type: 'decimal', precision: 10, scale: 2 })
     discountValue: number;
 
-    @Column({ type: 'datetime', nullable: true })
+    @Column({ type: 'timestamp', nullable: true })
     expiryDate: Date;
 
     @Column({ default: 0 })

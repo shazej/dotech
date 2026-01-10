@@ -1,32 +1,22 @@
 import { Controller, Post, Get, Body, Param, Patch, Request, UseGuards, ParseEnumPipe } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
 import { BookingStatus } from './entities/booking.entity';
-
-// Mock AuthGuard for now, simply extraction userId from body or header is risky without real auth, 
-// using a placeholder decorator or assuming middleware adds 'user' to request.
-// In a real app we would use @UseGuards(JwtAuthGuard)
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
-
-@Injectable()
-export class MockAuthGuard implements CanActivate {
-    canActivate(context: ExecutionContext): boolean {
-        const request = context.switchToHttp().getRequest();
-        // Simulate auth: pass 'x-user-id' header
-        request.user = { id: request.headers['x-user-id'] };
-        // return !!request.user.id;
-        return true; // Open for now to ease testing
-    }
-}
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('bookings')
 export class BookingsController {
     constructor(private readonly bookingsService: BookingsService) { }
 
+    @Get()
+    @UseGuards(AuthGuard('jwt'))
+    async findAll(@Request() req: any) {
+        return this.bookingsService.findAll();
+    }
+
     @Post()
+    @UseGuards(AuthGuard('jwt'))
     async create(@Request() req: any, @Body() createBookingDto: any) {
-        // Assume req.user.id is populated by AuthGuard
-        const userId = req.headers['x-user-id'] || 'test-customer-id';
-        return this.bookingsService.create(userId, createBookingDto);
+        return this.bookingsService.create(req.user.id, createBookingDto);
     }
 
     @Patch(':id/accept')

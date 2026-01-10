@@ -109,6 +109,12 @@ export class BookingsService {
         });
     }
 
+    async findAll() {
+        return this.bookingsRepository.find({
+            relations: ['provider', 'customer'],
+        });
+    }
+
     async findOne(id: string) {
         return this.bookingsRepository.findOne({
             where: { id },

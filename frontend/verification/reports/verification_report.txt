@@ -1,0 +1,181 @@
+[2026-01-10T00:52:44.058Z] Starting Frontend Verification on http://localhost:3001
+[2026-01-10T00:52:45.229Z] --- PHASE 1: REACHABILITY ---
+[2026-01-10T00:52:45.580Z] BROWSER CONSOLE: INFO %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-01-10T00:52:45.629Z] BROWSER CONSOLE: LOG [HMR] connected
+[2026-01-10T00:52:46.283Z] Page Title: Create Next App
+[2026-01-10T00:52:46.329Z] Screenshot saved: 01_homepage.png
+[2026-01-10T00:52:46.329Z] --- PHASE 2: AUTH VERIFICATION ---
+[2026-01-10T00:52:46.520Z] BROWSER CONSOLE: VERBOSE [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o
+[2026-01-10T00:52:46.567Z] BROWSER CONSOLE: INFO %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-01-10T00:52:46.574Z] BROWSER CONSOLE: LOG [HMR] connected
+[2026-01-10T00:52:47.172Z] Screenshot saved: 02_login_page.png
+[2026-01-10T00:52:47.246Z] Attempting login with admin@dotech.com...
+[2026-01-10T00:52:47.278Z] API CALL: OPTIONS http://localhost:3000/auth/login [204]
+[2026-01-10T00:52:47.278Z]   > Authorization Header: MISSING
+[2026-01-10T00:52:47.440Z] API CALL: POST http://localhost:3000/auth/login [201]
+[2026-01-10T00:52:47.441Z]   > Authorization Header: MISSING
+[2026-01-10T00:52:47.441Z]   > Payload: {"email":"admin@dotech.com","password":"password123"}
+[2026-01-10T00:52:47.443Z]   > Response: {"accessToken":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTk5OTJmYy05OTk5LTRiNjItYWQyYS04YzkxNTU3ZWIxN2QiLCJwaG9uZSI6Iis5OTkwMDAwMDAiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NjgwMDYzNjcsImV4cCI6MTc2ODA5Mjc2N30.9U-0otq5VfzEm5kDvFHjFRHTKPz3kj0AOQwlyoVwYOw","user":{"id":"6a9992fc-9999-4b62-ad2a-8c91557eb17d","phone":"+999000000","role":"admin","isVerified":true}}
+[2026-01-10T00:52:47.558Z] BROWSER CONSOLE: LOG [Fast Refresh] rebuilding
+[2026-01-10T00:52:49.002Z] BROWSER CONSOLE: LOG [Fast Refresh] done in 1544ms
+[2026-01-10T00:52:49.092Z] API CALL: OPTIONS http://localhost:3000/bookings [204]
+[2026-01-10T00:52:49.092Z]   > Authorization Header: MISSING
+[2026-01-10T00:52:49.118Z] API CALL: GET http://localhost:3000/bookings [200]
+[2026-01-10T00:52:49.118Z]   > Authorization Header: Present (Bearer eyJhbGciOi...)
+[2026-01-10T00:52:49.119Z]   > Response: [{"id":"2a10b013-ae35-4fab-8e59-e29f4b967093","customerId":"53f31d5e-251b-466e-9ac8-f722b0fd515a","customer":{"id":"53f31d5e-251b-466e-9ac8-f722b0fd515a","phone":"+999333333","email":"customer1@dotech.com","role":"customer","isVerified":true,"lastOtp":null,"otpExpiry":null,"createdAt":"2026-01-10T00:35:03.619Z","updatedAt":"2026-01-10T00:35:03.619Z"},"providerId":"55e4d89a-7689-449f-b263-6d17020158bb","provider":{"id":"55e4d89a-7689-449f-b263-6d17020158bb","businessName":"Business of provider1",
+[2026-01-10T00:52:51.132Z] Screenshot saved: 03_after_login.png
+[2026-01-10T00:52:51.135Z] PASS: Token found in LocalStorage: {"state":{"user":{"i...
+[2026-01-10T00:52:51.135Z] --- PHASE 3: PROTECTED ROUTE /bookings ---
+[2026-01-10T00:52:51.312Z] BROWSER CONSOLE: LOG [Fast Refresh] rebuilding
+[2026-01-10T00:52:52.060Z] BROWSER CONSOLE: LOG [Fast Refresh] done in 846ms
+[2026-01-10T00:52:52.315Z] BROWSER CONSOLE: INFO %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-01-10T00:52:52.329Z] BROWSER CONSOLE: LOG [HMR] connected
+[2026-01-10T00:52:52.406Z] API CALL: GET http://localhost:3000/bookings [304]
+[2026-01-10T00:52:52.406Z]   > Authorization Header: Present (Bearer eyJhbGciOi...)
+[2026-01-10T00:52:52.570Z] BROWSER CONSOLE: LOG [Fast Refresh] rebuilding
+[2026-01-10T00:52:52.674Z] BROWSER CONSOLE: LOG [Fast Refresh] done in 214ms
+[2026-01-10T00:52:56.430Z] Screenshot saved: 04_bookings_page.png
+[2026-01-10T00:52:56.433Z] PASS: Stayed on http://localhost:3001/dashboard/bookings
+[2026-01-10T00:52:56.433Z] --- PHASE 4: SERVICES LISTING ---
+[2026-01-10T00:52:56.802Z] BROWSER CONSOLE: LOG [Fast Refresh] rebuilding
+[2026-01-10T00:52:57.586Z] BROWSER CONSOLE: ERROR ./src/hooks/use-service.ts:56:17
+Ecmascript file had an error
+  54 | }
+  55 |
+> 56 | export function useCategories() {
+     |                 ^^^^^^^^^^^^^
+  57 |     return useQuery({
+  58 |         queryKey: ['categories'],
+  59 |         queryFn: serviceService.getCategories,
+
+the name `useCategories` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./src/hooks/use-service.ts [Client Component Browser]
+    ./src/app/dashboard/services/page.tsx [Client Component Browser]
+    ./src/app/dashboard/services/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/hooks/use-service.ts [Client Component SSR]
+    ./src/app/dashboard/services/page.tsx [Client Component SSR]
+    ./src/app/dashboard/services/page.tsx [Server Component]
+[2026-01-10T00:52:57.723Z] BROWSER CONSOLE: LOG [Fast Refresh] rebuilding
+[2026-01-10T00:52:58.084Z] BROWSER CONSOLE: ERROR ./src/hooks/use-service.ts:56:17
+Ecmascript file had an error
+  54 | }
+  55 |
+> 56 | export function useCategories() {
+     |                 ^^^^^^^^^^^^^
+  57 |     return useQuery({
+  58 |         queryKey: ['categories'],
+  59 |         queryFn: serviceService.getCategories,
+
+the name `useCategories` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./src/hooks/use-service.ts [Client Component Browser]
+    ./src/app/dashboard/services/page.tsx [Client Component Browser]
+    ./src/app/dashboard/services/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/hooks/use-service.ts [Client Component SSR]
+    ./src/app/dashboard/services/page.tsx [Client Component SSR]
+    ./src/app/dashboard/services/page.tsx [Server Component]
+[2026-01-10T00:52:58.133Z] BROWSER CONSOLE: ERROR ./src/hooks/use-service.ts:56:17
+Ecmascript file had an error
+  54 | }
+  55 |
+> 56 | export function useCategories() {
+     |                 ^^^^^^^^^^^^^
+  57 |     return useQuery({
+  58 |         queryKey: ['categories'],
+  59 |         queryFn: serviceService.getCategories,
+
+the name `useCategories` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./src/hooks/use-service.ts [Client Component Browser]
+    ./src/app/dashboard/services/page.tsx [Client Component Browser]
+    ./src/app/dashboard/services/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/hooks/use-service.ts [Client Component SSR]
+    ./src/app/dashboard/services/page.tsx [Client Component SSR]
+    ./src/app/dashboard/services/page.tsx [Server Component]
+[2026-01-10T00:52:58.233Z] BROWSER CONSOLE: LOG [Fast Refresh] rebuilding
+[2026-01-10T00:52:58.363Z] BROWSER CONSOLE: ERROR ./src/hooks/use-service.ts:56:17
+Ecmascript file had an error
+  54 | }
+  55 |
+> 56 | export function useCategories() {
+     |                 ^^^^^^^^^^^^^
+  57 |     return useQuery({
+  58 |         queryKey: ['categories'],
+  59 |         queryFn: serviceService.getCategories,
+
+the name `useCategories` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./src/hooks/use-service.ts [Client Component Browser]
+    ./src/app/dashboard/services/page.tsx [Client Component Browser]
+    ./src/app/dashboard/services/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/hooks/use-service.ts [Client Component SSR]
+    ./src/app/dashboard/services/page.tsx [Client Component SSR]
+    ./src/app/dashboard/services/page.tsx [Server Component]
+[2026-01-10T00:52:58.392Z] BROWSER CONSOLE: ERROR Failed to load resource: the server responded with a status of 500 (Internal Server Error)
+[2026-01-10T00:52:58.516Z] BROWSER CONSOLE: INFO %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[2026-01-10T00:52:58.651Z] BROWSER CONSOLE: LOG [HMR] connected
+[2026-01-10T00:52:58.653Z] BROWSER CONSOLE: ERROR ./src/hooks/use-service.ts:56:17
+Ecmascript file had an error
+  54 | }
+  55 |
+> 56 | export function useCategories() {
+     |                 ^^^^^^^^^^^^^
+  57 |     return useQuery({
+  58 |         queryKey: ['categories'],
+  59 |         queryFn: serviceService.getCategories,
+
+the name `useCategories` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./src/hooks/use-service.ts [Client Component Browser]
+    ./src/app/dashboard/services/page.tsx [Client Component Browser]
+    ./src/app/dashboard/services/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/hooks/use-service.ts [Client Component SSR]
+    ./src/app/dashboard/services/page.tsx [Client Component SSR]
+    ./src/app/dashboard/services/page.tsx [Server Component]
+[2026-01-10T00:52:58.700Z] BROWSER CONSOLE: LOG [Fast Refresh] rebuilding
+[2026-01-10T00:52:58.719Z] BROWSER CONSOLE: CLEAR console.clear
+[2026-01-10T00:52:58.719Z] BROWSER CONSOLE: ERROR ./src/hooks/use-service.ts:56:17
+Ecmascript file had an error
+  54 | }
+  55 |
+> 56 | export function useCategories() {
+     |                 ^^^^^^^^^^^^^
+  57 |     return useQuery({
+  58 |         queryKey: ['categories'],
+  59 |         queryFn: serviceService.getCategories,
+
+the name `useCategories` is defined multiple times
+
+Import traces:
+  Client Component Browser:
+    ./src/hooks/use-service.ts [Client Component Browser]
+    ./src/app/dashboard/services/page.tsx [Client Component Browser]
+    ./src/app/dashboard/services/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/hooks/use-service.ts [Client Component SSR]
+    ./src/app/dashboard/services/page.tsx [Client Component SSR]
+    ./src/app/dashboard/services/page.tsx [Server Component]
+[2026-01-10T00:53:01.285Z] Screenshot saved: 05_services_page.png
+[2026-01-10T00:53:01.285Z] Verification Complete. Report saved to /Users/shazej/Documents/alwaleed/dotech/frontend/verification/reports/verification_report.txt

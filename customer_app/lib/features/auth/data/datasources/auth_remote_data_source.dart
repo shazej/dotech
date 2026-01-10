@@ -37,14 +37,18 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         if (accessToken != null) {
           await storage.write(key: 'accessToken', value: accessToken);
         }
-        // Normally, response.data would contain the user or token.
-        // Assuming the NestJS backend might need adjustment or we mock the User here for now
-        // based on the token payload if needed.
+        // Parse user from response
+        final userData = response.data['user'];
+        if (userData != null) {
+          return UserModel.fromJson(userData);
+        }
+        
+        // Fallback if user data is missing but we have token (unlikely with our backend)
         return UserModel(
-          id: 'temp-id', // Placeholder or extract from JWT payload
-          phone: phone,
-          role: 'customer',
-          isVerified: true,
+          id: 'extracted-from-token', 
+          phone: phone, 
+          role: 'customer', 
+          isVerified: true
         );
       }
       throw const ServerFailure(message: 'Verification failed');

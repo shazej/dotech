@@ -20,6 +20,9 @@ export class User {
     @Column({ nullable: true, unique: true })
     email?: string;
 
+    @Column({ nullable: true, select: false })
+    password?: string;
+
     @Column({
         type: 'simple-enum',
         enum: UserRole,
@@ -33,7 +36,7 @@ export class User {
     @Column({ nullable: true })
     lastOtp?: string;
 
-    @Column({ type: 'datetime', nullable: true })
+    @Column({ type: 'timestamp', nullable: true })
     otpExpiry?: Date;
 
     @OneToOne(() => CustomerProfile, (profile) => profile.user, { cascade: true })

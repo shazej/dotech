@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -63,9 +64,16 @@ Future<void> init() async {
 
   // External
   sl.registerLazySingleton(() {
+    // Deterministic Base URL Resolution
+    // Android Emulator uses 10.0.2.2 to access host localhost
+    // iOS Simulator uses localhost
+    final baseUrl = Platform.isAndroid 
+        ? 'http://10.0.2.2:3000' 
+        : 'http://localhost:3000';
+
     final dio = Dio(
       BaseOptions(
-        baseUrl: 'http://192.168.8.16:3000',
+        baseUrl: baseUrl,
         connectTimeout: const Duration(seconds: 5),
         receiveTimeout: const Duration(seconds: 3),
       ),

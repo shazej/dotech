@@ -50,10 +50,10 @@ export class Booking {
     })
     status: BookingStatus;
 
-    @Column({ type: 'datetime' })
+    @Column({ type: 'timestamp' })
     scheduledAt: Date;
 
-    @Column({ type: 'datetime', nullable: true })
+    @Column({ type: 'timestamp', nullable: true })
     completedAt: Date;
 
     @OneToMany(() => BookingAttachment, (attachment) => attachment.booking, { cascade: true })

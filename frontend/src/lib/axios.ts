@@ -8,7 +8,7 @@ export const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
-    withCredentials: true, // If using cookies
+    withCredentials: false, // headers-based auth does not need this, and it breaks CORS with wildcard origin
 });
 
 api.interceptors.request.use(
