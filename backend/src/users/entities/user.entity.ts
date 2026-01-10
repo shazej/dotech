@@ -18,6 +18,9 @@ export class User {
     phone: string;
 
     @Column({ nullable: true, unique: true })
+    firebaseUid?: string;
+
+    @Column({ nullable: true, unique: true })
     email?: string;
 
     @Column({ nullable: true, select: false })

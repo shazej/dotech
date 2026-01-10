@@ -1,11 +1,15 @@
-import { Controller, Post, Get, Body, UnauthorizedException, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Request } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { UserRole } from '../users/entities/user.entity';
+import { FirebaseAuthService } from './firebase-auth.service';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) { }
+    constructor(
+        private readonly authService: AuthService,
+        private readonly firebaseAuthService: FirebaseAuthService,
+    ) { }
 
     @Post('otp/send')
     async sendOtp(@Body('phone') phone: string) {
@@ -28,13 +32,14 @@ export class AuthController {
         return this.authService.loginWithPassword(body.email, body.password);
     }
 
+    @Post('firebase')
+    async firebase(@Body('idToken') idToken: string) {
+        return this.firebaseAuthService.verifyFirebaseToken(idToken);
+    }
+
     @Get('me')
     @UseGuards(AuthGuard('jwt'))
     getMe(@Request() req: any) {
-        // Map to frontend expected format if needed, or just return what we have
-        // Frontend expects id, email, role. JwtStrategy returns userId, phone, role.
-        // We might need to fetch the full user if we want email/profile.
-        // For now, let's return the basic info and handle frontend mapping.
         return {
             id: req.user.userId,
             phone: req.user.phone,
@@ -42,3 +47,6 @@ export class AuthController {
         };
     }
 }
+
+
+

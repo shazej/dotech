@@ -62,4 +62,19 @@ export class UsersService {
     async findProviderProfile(userId: string): Promise<ProviderProfile | null> {
         return this.providerProfilesRepository.findOneBy({ userId });
     }
+    async findOneByFirebaseUid(firebaseUid: string): Promise<User | null> {
+        return this.usersRepository.findOne({ where: { firebaseUid } });
+    }
+
+    async createWithFirebase(firebaseUid: string, email: string | null, phone: string | null, role: UserRole): Promise<User> {
+        const user = this.usersRepository.create({
+            firebaseUid,
+            email: email ?? undefined,
+            phone: phone ?? undefined,
+            role,
+            isVerified: true,
+        });
+        return this.usersRepository.save(user);
+    }
 }
+
