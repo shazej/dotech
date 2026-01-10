@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:dotech_customer/core/globals.dart';
+import 'package:dotech_customer/features/booking/presentation/pages/booking_detail_page.dart';
 import 'package:dotech_customer/injection_container/injection_container.dart'
     as di;
 import 'package:dotech_customer/features/auth/presentation/bloc/auth_bloc.dart';
@@ -7,15 +9,15 @@ import 'package:dotech_customer/features/discovery/presentation/bloc/discovery_b
 import 'package:dotech_customer/features/booking/presentation/bloc/booking_bloc.dart';
 import 'package:dotech_customer/features/auth/presentation/pages/login_page.dart';
 
+import 'package:dotech_customer/core/services/notification_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init();
 
   // Initialize Notifications
-  // In a real app, this would happen after login with the actual user ID
-  // For demo, we might skip or put it in a bloc
-  // final notificationService = NotificationService();
-  // notificationService.init('123'); // Mock User ID
+  final notificationService = di.sl<NotificationService>();
+  await notificationService.init();
 
   runApp(const MyApp());
 }
@@ -25,6 +27,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => di.sl<AuthBloc>()),
@@ -32,6 +35,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => di.sl<BookingBloc>()),
       ],
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         title: 'Dotech Customer',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -40,6 +44,11 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         ),
         home: const LoginPage(),
+        routes: {
+          '/booking_detail': (context) => BookingDetailPage(
+                bookingId: ModalRoute.of(context)!.settings.arguments as String,
+              ),
+        },
       ),
     );
   }

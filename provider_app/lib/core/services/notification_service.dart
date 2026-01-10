@@ -6,7 +6,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:dotech_customer/core/globals.dart';
 
 // Top-level function for background handling
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -101,15 +100,8 @@ class NotificationService {
         message.data['type'] == 'BOOKING_COMPLETED' || 
         message.data['type'] == 'BOOKING_REJECTED') {
           
-       final bookingId = message.data['bookingId'];
-       debugPrint('Deep Link to Booking: $bookingId');
-
-       if (bookingId != null) {
-          navigatorKey.currentState?.pushNamed(
-            '/booking_detail',
-            arguments: bookingId,
-          );
-       }
+       // TODO: Use a global navigation key or router to navigate to Booking Details
+       debugPrint('Deep Link to Booking: ${message.data['bookingId']}');
     }
   }
 }

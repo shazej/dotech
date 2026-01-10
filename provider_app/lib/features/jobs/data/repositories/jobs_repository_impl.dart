@@ -21,6 +21,17 @@ class JobsRepositoryImpl implements JobsRepository {
   }
 
   @override
+  Future<Either<Failure, Job>> getJobById(String id) async {
+    try {
+        final job = await remoteDataSource.getJobById(id);
+        return Right(job);
+    } catch (e) {
+        if (e is Failure) return Left(e);
+        return const Left(ServerFailure(message: 'Failed to retrieve job details'));
+    }
+  }
+
+  @override
   Future<Either<Failure, Job>> updateJobStatus(
     String jobId,
     String status,

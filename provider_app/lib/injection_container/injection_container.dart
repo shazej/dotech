@@ -1,30 +1,9 @@
 import 'dart:io';
-
-// ... imports ...
-
-  sl.registerLazySingleton(() {
-    
-    String resolveBaseUrl() {
-       const port = '3000';
-       if (Platform.isAndroid) {
-           return 'http://10.0.2.2:$port';
-       }
-       return 'http://localhost:$port';
-    }
-
-    final dio = Dio(
-      BaseOptions(
-        baseUrl: resolveBaseUrl(),
-        connectTimeout: const Duration(seconds: 5),
-        receiveTimeout: const Duration(seconds: 3),
-      ),
-    );
-    dio.interceptors.add(sl<AuthInterceptor>());
-    return dio;
-  });
+import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../core/network/auth_interceptor.dart';
+import '../core/services/notification_service.dart';
 
 // Auth
 import '../features/auth/data/datasources/auth_remote_data_source.dart';
@@ -88,14 +67,24 @@ Future<void> init() async {
     () => JobsRemoteDataSourceImpl(dio: sl()),
   );
 
+  // Core - Notifications
+  sl.registerLazySingleton<NotificationService>(
+    () => NotificationService(sl(), sl()),
+  );
+
+
   // External
   sl.registerLazySingleton(() {
+    // Deterministic Base URL Resolution
+    // Android Emulator uses 10.0.2.2 to access host localhost
+    // iOS Simulator uses localhost
+    final baseUrl = Platform.isAndroid 
+        ? 'http://10.0.2.2:3000' 
+        : 'http://localhost:3000';
+
     final dio = Dio(
       BaseOptions(
-        // INSTRUCTION:
-        // Android Emulator: http://10.0.2.2:3000
-        // iOS Simulator: http://localhost:3000
-        baseUrl: 'http://localhost:3000',
+        baseUrl: baseUrl,
         connectTimeout: const Duration(seconds: 5),
         receiveTimeout: const Duration(seconds: 3),
       ),
@@ -108,3 +97,4 @@ Future<void> init() async {
   sl.registerLazySingleton(() => const FlutterSecureStorage());
   sl.registerLazySingleton(() => AuthInterceptor(sl()));
 }
+

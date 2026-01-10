@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 import 'package:dotech_customer/features/booking/domain/entities/booking.dart';
 import 'package:dotech_customer/features/booking/domain/usecases/create_booking.dart';
 
+import 'package:dotech_customer/features/booking/domain/usecases/get_booking_by_id.dart';
+
 abstract class BookingEvent extends Equatable {
   const BookingEvent();
   @override
@@ -24,6 +26,13 @@ class PlaceBookingEvent extends BookingEvent {
   List<Object?> get props => [serviceId, scheduledAt, addressId];
 }
 
+class GetBookingDetailEvent extends BookingEvent {
+    final String bookingId;
+    const GetBookingDetailEvent(this.bookingId);
+    @override
+    List<Object?> get props => [bookingId];
+}
+
 abstract class BookingState extends Equatable {
   const BookingState();
   @override
@@ -41,6 +50,13 @@ class BookingPlaced extends BookingState {
   List<Object?> get props => [booking];
 }
 
+class BookingDetailLoaded extends BookingState {
+    final Booking booking;
+    const BookingDetailLoaded(this.booking);
+    @override
+    List<Object?> get props => [booking];
+}
+
 class BookingError extends BookingState {
   final String message;
   const BookingError(this.message);
@@ -50,8 +66,12 @@ class BookingError extends BookingState {
 
 class BookingBloc extends Bloc<BookingEvent, BookingState> {
   final CreateBooking createBookingUseCase;
+  final GetBookingById? getBookingByIdUseCase;
 
-  BookingBloc({required this.createBookingUseCase}) : super(BookingInitial()) {
+  BookingBloc({
+    required this.createBookingUseCase,
+    this.getBookingByIdUseCase,
+  }) : super(BookingInitial()) {
     on<PlaceBookingEvent>((event, emit) async {
       emit(BookingLoading());
       final result = await createBookingUseCase(
@@ -65,6 +85,19 @@ class BookingBloc extends Bloc<BookingEvent, BookingState> {
         (failure) => emit(BookingError(failure.message)),
         (booking) => emit(BookingPlaced(booking)),
       );
+    });
+
+    on<GetBookingDetailEvent>((event, emit) async {
+        if (getBookingByIdUseCase == null) {
+            emit(const BookingError('Feature not configured'));
+            return;
+        }
+        emit(BookingLoading());
+        final result = await getBookingByIdUseCase!(event.bookingId);
+        result.fold(
+            (failure) => emit(BookingError(failure.message)),
+            (booking) => emit(BookingDetailLoaded(booking)),
+        );
     });
   }
 }

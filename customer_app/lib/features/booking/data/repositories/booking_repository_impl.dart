@@ -38,4 +38,15 @@ class BookingRepositoryImpl implements BookingRepository {
       return const Left(ServerFailure(message: 'Booking Retrieval Error'));
     }
   }
+
+  @override
+  Future<Either<Failure, Booking>> getBookingById(String id) async {
+    try {
+      final booking = await remoteDataSource.getBookingById(id);
+      return Right(booking);
+    } catch (e) {
+       if (e is Failure) return Left(e);
+       return const Left(ServerFailure(message: 'Booking Details Error'));
+    }
+  }
 }

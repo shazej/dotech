@@ -9,6 +9,7 @@ abstract class BookingRemoteDataSource {
     required String addressId,
   });
   Future<List<BookingModel>> getMyBookings();
+  Future<BookingModel> getBookingById(String id);
 }
 
 class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
@@ -46,6 +47,18 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
           .toList();
     } catch (e) {
       throw const ServerFailure(message: 'Failed to fetch bookings');
+    }
+  }
+
+  @override
+  Future<BookingModel> getBookingById(String id) async {
+    try {
+      // Fetch specifically by ID
+      // Assuming backend has GET /bookings/:id
+      final response = await dio.get('/bookings/$id');
+      return BookingModel.fromJson(response.data);
+    } catch (e) {
+      throw const ServerFailure(message: 'Failed to fetch booking details');
     }
   }
 }

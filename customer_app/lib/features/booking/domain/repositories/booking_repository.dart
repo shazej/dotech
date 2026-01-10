@@ -9,4 +9,5 @@ abstract class BookingRepository {
     required String addressId,
   });
   Future<Either<Failure, List<Booking>>> getMyBookings();
+  Future<Either<Failure, Booking>> getBookingById(String id);
 }

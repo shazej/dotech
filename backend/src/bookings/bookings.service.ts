@@ -6,12 +6,15 @@ import { Service } from '../services/entities/service.entity';
 import { ProviderProfile } from '../users/entities/provider-profile.entity';
 import { User } from '../users/entities/user.entity';
 
+import { NotificationsService } from '../notifications/notifications.service';
+
 @Injectable()
 export class BookingsService {
     constructor(
         @InjectRepository(Booking)
         private bookingsRepository: Repository<Booking>,
         private dataSource: DataSource,
+        private notificationsService: NotificationsService,
     ) { }
 
     async create(customerId: string, createBookingDto: { providerId: string; serviceId: string; scheduledAt: string }) {
@@ -46,7 +49,17 @@ export class BookingsService {
                 },
             });
 
-            return manager.save(booking);
+            const savedBooking = await manager.save(booking);
+
+            // Notify Provider
+            this.notificationsService.notifyUser(
+                provider.userId,
+                'New Booking Request',
+                `You have a new booking request for ${service.name}`,
+                { type: 'BOOKING_CREATED', bookingId: savedBooking.id }
+            );
+
+            return savedBooking;
         });
     }
 
@@ -54,7 +67,7 @@ export class BookingsService {
         return this.dataSource.transaction(async (manager) => {
             const booking = await manager.findOne(Booking, {
                 where: { id: bookingId },
-                relations: ['provider']
+                relations: ['provider', 'customer']
             });
             if (!booking) throw new NotFoundException('Booking not found');
 
@@ -67,18 +80,35 @@ export class BookingsService {
             }
 
             booking.status = BookingStatus.ACCEPTED;
-            return manager.save(booking);
+            const savedBooking = await manager.save(booking);
+
+            // Notify Customer
+            this.notificationsService.notifyUser(
+                booking.customerId,
+                'Booking Accepted',
+                `Your booking for ${booking.serviceSnapshot.name} has been accepted`,
+                { type: 'BOOKING_ACCEPTED', bookingId: savedBooking.id }
+            );
+
+            return savedBooking;
         });
     }
 
     async updateStatus(bookingId: string, userId: string, newStatus: BookingStatus) {
         return this.dataSource.transaction(async (manager) => {
-            const booking = await manager.findOne(Booking, { where: { id: bookingId } });
+            const booking = await manager.findOne(Booking, {
+                where: { id: bookingId },
+                relations: ['provider', 'customer']
+            });
             if (!booking) throw new NotFoundException('Booking not found');
 
             // Simple authorization check (should be more robust in real app via Guards)
-            if (booking.providerId !== userId && booking.customerId !== userId) {
-                throw new BadRequestException('Not authorized to modify this booking');
+            // Note: need to check userId against either provider.userId or customerId
+            // For now assuming userId passed is the user's ID
+            if (booking.provider?.userId !== userId && booking.customerId !== userId) {
+                // Check if the user is the provider owner
+                if (booking.provider?.userId !== userId)
+                    throw new BadRequestException('Not authorized to modify this booking');
             }
 
             // State Machine Transitions
@@ -103,6 +133,20 @@ export class BookingsService {
 
             if (newStatus === BookingStatus.COMPLETED) {
                 booking.completedAt = new Date();
+                // Notify Customer
+                this.notificationsService.notifyUser(
+                    booking.customerId,
+                    'Booking Completed',
+                    `Your booking has been completed`,
+                    { type: 'BOOKING_COMPLETED', bookingId: booking.id }
+                );
+            } else if (newStatus === BookingStatus.REJECTED) {
+                this.notificationsService.notifyUser(
+                    booking.customerId,
+                    'Booking Rejected',
+                    `Your booking was rejected by the provider`,
+                    { type: 'BOOKING_REJECTED', bookingId: booking.id }
+                );
             }
 
             return manager.save(booking);

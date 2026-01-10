@@ -8,6 +8,9 @@ class Booking extends Equatable {
   final DateTime scheduledAt;
   final String status;
   final String addressId;
+  final String? serviceName;
+  final double? price;
+  final int? durationMinutes;
 
   const Booking({
     required this.id,
@@ -17,6 +20,9 @@ class Booking extends Equatable {
     required this.scheduledAt,
     required this.status,
     required this.addressId,
+    this.serviceName,
+    this.price,
+    this.durationMinutes,
   });
 
   @override
@@ -28,5 +34,8 @@ class Booking extends Equatable {
     scheduledAt,
     status,
     addressId,
+    serviceName,
+    price,
+    durationMinutes,
   ];
 }

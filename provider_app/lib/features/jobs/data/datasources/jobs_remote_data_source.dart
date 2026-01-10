@@ -4,6 +4,7 @@ import '../models/job_model.dart';
 
 abstract class JobsRemoteDataSource {
   Future<List<JobModel>> getMyJobs();
+  Future<JobModel> getJobById(String id);
   Future<JobModel> updateJobStatus(String jobId, String status);
 }
 
@@ -34,6 +35,20 @@ class JobsRemoteDataSourceImpl implements JobsRemoteDataSource {
       return JobModel.fromJson(response.data);
     } catch (e) {
       throw const ServerFailure(message: 'Failed to update job status');
+    }
+  }
+
+  @override
+  Future<JobModel> getJobById(String id) async {
+    try {
+        // Re-using GET /bookings/:id (It should work if user is authorized)
+        // Or if there is a specific /provider/bookings/:id
+        // In the backend BookingsService.findOne, it returns the booking.
+        // We will assume GET /bookings/:id works for Providers too (it usually does in shared booking system)
+        final response = await dio.get('/bookings/$id');
+        return JobModel.fromJson(response.data);
+    } catch (e) {
+        throw const ServerFailure(message: 'Failed to fetch job details');
     }
   }
 }

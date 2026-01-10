@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../core/network/auth_interceptor.dart';
+import '../core/services/notification_service.dart';
 
 // Auth
 import '../features/auth/data/datasources/auth_remote_data_source.dart';
@@ -24,6 +25,7 @@ import '../features/booking/data/datasources/booking_remote_data_source.dart';
 import '../features/booking/data/repositories/booking_repository_impl.dart';
 import '../features/booking/domain/repositories/booking_repository.dart';
 import '../features/booking/domain/usecases/create_booking.dart';
+import '../features/booking/domain/usecases/get_booking_by_id.dart';
 import '../features/booking/presentation/bloc/booking_bloc.dart';
 
 final sl = GetIt.instance;
@@ -53,13 +55,22 @@ Future<void> init() async {
   );
 
   // Features - Booking
-  sl.registerFactory(() => BookingBloc(createBookingUseCase: sl()));
+  sl.registerFactory(() => BookingBloc(
+      createBookingUseCase: sl(),
+      getBookingByIdUseCase: sl(),
+  ));
   sl.registerLazySingleton(() => CreateBooking(sl()));
+  sl.registerLazySingleton(() => GetBookingById(sl()));
   sl.registerLazySingleton<BookingRepository>(
     () => BookingRepositoryImpl(remoteDataSource: sl()),
   );
   sl.registerLazySingleton<BookingRemoteDataSource>(
     () => BookingRemoteDataSourceImpl(dio: sl()),
+  );
+
+  // Core - Notifications
+  sl.registerLazySingleton<NotificationService>(
+    () => NotificationService(sl(), sl()),
   );
 
   // External

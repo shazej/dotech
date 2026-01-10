@@ -7,9 +7,16 @@ import 'package:dotech_provider/features/onboarding/presentation/bloc/onboarding
 import 'package:dotech_provider/features/jobs/presentation/bloc/jobs_bloc.dart';
 import 'package:dotech_provider/features/auth/presentation/pages/login_page.dart';
 
+import 'package:dotech_provider/core/services/notification_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await di.init();
+
+  // Initialize Notifications
+  final notificationService = di.sl<NotificationService>();
+  await notificationService.init();
+
   runApp(const ProviderApp());
 }
 
