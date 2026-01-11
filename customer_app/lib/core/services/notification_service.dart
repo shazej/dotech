@@ -15,6 +15,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class NotificationService {
+  // Track processed messages to prevent duplicate navigation
+  final Set<String> _processedMessageIds = {};
+
   final Dio _dio;
   final FlutterSecureStorage _storage;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
@@ -40,23 +43,26 @@ class NotificationService {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     // 3. Get Token and Register
-    String? token = await _firebaseMessaging.getToken();
-    if (token != null) {
-      debugPrint('FCM Token: $token');
-      await _registerToken(token);
+    try {
+      String? token = await _firebaseMessaging.getToken();
+      if (token != null) {
+        debugPrint('FCM Token: $token');
+        await _registerToken(token);
+      }
+    } catch (e) {
+      debugPrint('Error fetching token: $e');
     }
 
     // 4. Handle Token Refresh
     _firebaseMessaging.onTokenRefresh.listen(_registerToken);
 
-    // 5. Handle Foreground Messages
+    // 5. Handle Foreground Messages - Optional: Allow in-app deep link on tap if implemented as a customized toast
+    // For now, simpler behavior: receiving a message in foreground does NOT auto-navigate.
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('Got a message whilst in the foreground!');
       debugPrint('Message data: ${message.data}');
-
       if (message.notification != null) {
-        debugPrint('Message also contained a notification: ${message.notification}');
-        // Show local notification or update UI via Bloc
+         debugPrint('Title: ${message.notification?.title}');
       }
     });
 
@@ -88,28 +94,53 @@ class NotificationService {
     RemoteMessage? initialMessage = await _firebaseMessaging.getInitialMessage();
 
     if (initialMessage != null) {
-      _handleMessage(initialMessage);
+      handleMessage(initialMessage, isInitial: true);
     }
 
     // Also handle any interaction when the app is in the background via a Stream listener
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen((msg) => handleMessage(msg, isInitial: false));
   }
 
-  void _handleMessage(RemoteMessage message) {
-    if (message.data['type'] == 'BOOKING_CREATED' ||
-        message.data['type'] == 'BOOKING_ACCEPTED' ||
-        message.data['type'] == 'BOOKING_COMPLETED' || 
-        message.data['type'] == 'BOOKING_REJECTED') {
-          
-       final bookingId = message.data['bookingId'];
-       debugPrint('Deep Link to Booking: $bookingId');
+  void handleMessage(RemoteMessage message, {bool isInitial = false}) async {
+    // 1. Dedup using messageId
+    if (message.messageId != null) {
+      if (_processedMessageIds.contains(message.messageId)) {
+         debugPrint('Duplicate message ignored: ${message.messageId}');
+         return;
+      }
+      _processedMessageIds.add(message.messageId!);
+    }
 
-       if (bookingId != null) {
-          navigatorKey.currentState?.pushNamed(
+    // 2. Validate Payload
+    final type = message.data['type'];
+    final bookingId = message.data['bookingId'];
+
+    if (bookingId == null || type == null) {
+       debugPrint('Ignored push: Missing bookingId or type. Data: ${message.data}');
+       return;
+    }
+
+    debugPrint('Deep Link Handled | Type: $type | ID: $bookingId | Initial: $isInitial');
+
+    if (type == 'BOOKING_CREATED' ||
+        type == 'BOOKING_ACCEPTED' ||
+        type == 'BOOKING_COMPLETED' || 
+        type == 'BOOKING_REJECTED') {
+          
+        // 3. Safe Navigation (wait for Navigator if cold start)
+        if (isInitial) {
+            // Wait loop to ensure MyApp is mounted and navigatorKey is attached
+            int retries = 0;
+            while (navigatorKey.currentState == null && retries < 10) {
+                 await Future.delayed(const Duration(milliseconds: 500));
+                 retries++;
+            }
+        }
+        
+        navigatorKey.currentState?.pushNamed(
             '/booking_detail',
             arguments: bookingId,
-          );
-       }
+        );
     }
   }
 }

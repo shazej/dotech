@@ -4,6 +4,7 @@ import 'package:dotech_provider/core/usecases/usecase.dart';
 import 'package:dotech_provider/features/jobs/domain/entities/job.dart';
 import 'package:dotech_provider/features/jobs/domain/usecases/get_my_jobs.dart';
 import 'package:dotech_provider/features/jobs/domain/usecases/update_job_status.dart';
+import 'package:dotech_provider/features/jobs/domain/usecases/get_job_by_id.dart';
 
 abstract class JobsEvent extends Equatable {
   const JobsEvent();
@@ -12,6 +13,13 @@ abstract class JobsEvent extends Equatable {
 }
 
 class LoadJobsEvent extends JobsEvent {}
+
+class GetJobDetailEvent extends JobsEvent {
+    final String jobId;
+    const GetJobDetailEvent(this.jobId);
+    @override
+    List<Object?> get props => [jobId];
+}
 
 class UpdateStatusEvent extends JobsEvent {
   final String jobId;
@@ -38,6 +46,13 @@ class JobsLoaded extends JobsState {
   List<Object?> get props => [jobs];
 }
 
+class JobDetailLoaded extends JobsState {
+    final Job job;
+    const JobDetailLoaded(this.job);
+    @override
+    List<Object?> get props => [job];
+}
+
 class JobsError extends JobsState {
   final String message;
   const JobsError(this.message);
@@ -48,10 +63,12 @@ class JobsError extends JobsState {
 class JobsBloc extends Bloc<JobsEvent, JobsState> {
   final GetMyJobs getMyJobsUseCase;
   final UpdateJobStatus updateJobStatusUseCase;
+  final GetJobById? getJobByIdUseCase;
 
   JobsBloc({
     required this.getMyJobsUseCase,
     required this.updateJobStatusUseCase,
+    this.getJobByIdUseCase,
   }) : super(JobsInitial()) {
     on<LoadJobsEvent>((event, emit) async {
       emit(JobsLoading());
@@ -60,6 +77,19 @@ class JobsBloc extends Bloc<JobsEvent, JobsState> {
         (failure) => emit(JobsError(failure.message)),
         (jobs) => emit(JobsLoaded(jobs)),
       );
+    });
+
+    on<GetJobDetailEvent>((event, emit) async {
+        if (getJobByIdUseCase == null) {
+             emit(const JobsError('Feature not configured'));
+             return;
+        }
+        emit(JobsLoading());
+        final result = await getJobByIdUseCase!(event.jobId);
+        result.fold(
+             (failure) => emit(JobsError(failure.message)),
+             (job) => emit(JobDetailLoaded(job)),
+        );
     });
 
     on<UpdateStatusEvent>((event, emit) async {

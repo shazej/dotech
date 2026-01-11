@@ -26,6 +26,7 @@ import '../features/jobs/data/repositories/jobs_repository_impl.dart';
 import '../features/jobs/domain/repositories/jobs_repository.dart';
 import '../features/jobs/domain/usecases/get_my_jobs.dart';
 import '../features/jobs/domain/usecases/update_job_status.dart';
+import '../features/jobs/domain/usecases/get_job_by_id.dart';
 import '../features/jobs/presentation/bloc/jobs_bloc.dart';
 
 final sl = GetIt.instance;
@@ -56,10 +57,15 @@ Future<void> init() async {
 
   // Features - Jobs
   sl.registerFactory(
-    () => JobsBloc(getMyJobsUseCase: sl(), updateJobStatusUseCase: sl()),
+    () => JobsBloc(
+        getMyJobsUseCase: sl(), 
+        updateJobStatusUseCase: sl(),
+        getJobByIdUseCase: sl(),
+    ),
   );
   sl.registerLazySingleton(() => GetMyJobs(sl()));
   sl.registerLazySingleton(() => UpdateJobStatus(sl()));
+  sl.registerLazySingleton(() => GetJobById(sl()));
   sl.registerLazySingleton<JobsRepository>(
     () => JobsRepositoryImpl(remoteDataSource: sl()),
   );

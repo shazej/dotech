@@ -72,7 +72,7 @@ class _DashboardPageState extends State<DashboardPage> {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => JobDetailPage(job: job)),
+                                MaterialPageRoute(builder: (_) => JobDetailPage(jobId: job.id, initialJob: job)),
                               );
                             },
                           ),
@@ -114,7 +114,7 @@ class _StatsOverview extends StatelessWidget {
         const SizedBox(width: 12),
         _buildStatCard('Completed', '15', Colors.green),
         const SizedBox(width: 12),
-        _buildStatCard('Revenue', '$1.2k', Colors.teal),
+        _buildStatCard('Revenue', '\$1.2k', Colors.teal),
       ],
     );
   }

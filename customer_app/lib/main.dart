@@ -11,8 +11,12 @@ import 'package:dotech_customer/features/auth/presentation/pages/login_page.dart
 
 import 'package:dotech_customer/core/services/notification_service.dart';
 
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   await di.init();
 
   // Initialize Notifications

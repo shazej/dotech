@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:dotech_provider/core/globals.dart';
 
 // Top-level function for background handling
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -14,6 +15,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 }
 
 class NotificationService {
+  // Track processed messages to prevent duplicate navigation
+  final Set<String> _processedMessageIds = {};
+
   final Dio _dio;
   final FlutterSecureStorage _storage;
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
@@ -39,10 +43,14 @@ class NotificationService {
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     // 3. Get Token and Register
-    String? token = await _firebaseMessaging.getToken();
-    if (token != null) {
-      debugPrint('FCM Token: $token');
-      await _registerToken(token);
+    try {
+      String? token = await _firebaseMessaging.getToken();
+      if (token != null) {
+        debugPrint('FCM Token: $token');
+        await _registerToken(token);
+      }
+    } catch (e) {
+      debugPrint('Error fetching token: $e');
     }
 
     // 4. Handle Token Refresh
@@ -52,10 +60,8 @@ class NotificationService {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('Got a message whilst in the foreground!');
       debugPrint('Message data: ${message.data}');
-
       if (message.notification != null) {
-        debugPrint('Message also contained a notification: ${message.notification}');
-        // Show local notification or update UI via Bloc
+         debugPrint('Title: ${message.notification?.title}');
       }
     });
 
@@ -87,21 +93,53 @@ class NotificationService {
     RemoteMessage? initialMessage = await _firebaseMessaging.getInitialMessage();
 
     if (initialMessage != null) {
-      _handleMessage(initialMessage);
+      _handleMessage(initialMessage, isInitial: true);
     }
 
     // Also handle any interaction when the app is in the background via a Stream listener
-    FirebaseMessaging.onMessageOpenedApp.listen(_handleMessage);
+    FirebaseMessaging.onMessageOpenedApp.listen((msg) => _handleMessage(msg, isInitial: false));
   }
 
-  void _handleMessage(RemoteMessage message) {
-    if (message.data['type'] == 'BOOKING_CREATED' ||
-        message.data['type'] == 'BOOKING_ACCEPTED' ||
-        message.data['type'] == 'BOOKING_COMPLETED' || 
-        message.data['type'] == 'BOOKING_REJECTED') {
+  void _handleMessage(RemoteMessage message, {bool isInitial = false}) async {
+    // 1. Dedup using messageId
+    if (message.messageId != null) {
+      if (_processedMessageIds.contains(message.messageId)) {
+         debugPrint('Duplicate message ignored: ${message.messageId}');
+         return;
+      }
+      _processedMessageIds.add(message.messageId!);
+    }
+
+    // 2. Validate Payload
+    final type = message.data['type'];
+    final bookingId = message.data['bookingId'];
+
+    if (bookingId == null || type == null) {
+       debugPrint('Ignored push: Missing bookingId or type. Data: ${message.data}');
+       return;
+    }
+
+    debugPrint('Deep Link Handled | Type: $type | ID: $bookingId | Initial: $isInitial');
+
+    if (type == 'BOOKING_CREATED' ||
+        type == 'BOOKING_ACCEPTED' ||
+        type == 'BOOKING_COMPLETED' || 
+        type == 'BOOKING_REJECTED') {
           
-       // TODO: Use a global navigation key or router to navigate to Booking Details
-       debugPrint('Deep Link to Booking: ${message.data['bookingId']}');
+        // 3. Safe Navigation (wait for Navigator if cold start)
+        if (isInitial) {
+            // Wait loop to ensure MyApp is mounted and navigatorKey is attached
+            int retries = 0;
+            while (navigatorKey.currentState == null && retries < 10) {
+                 await Future.delayed(const Duration(milliseconds: 500));
+                 retries++;
+            }
+        }
+        
+        navigatorKey.currentState?.pushNamed(
+            '/job_detail',
+            arguments: bookingId,
+        );
     }
   }
 }
